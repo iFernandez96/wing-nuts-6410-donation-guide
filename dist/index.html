@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="./styles.css">
     <script src="./calculator.js" defer></script>
     <script src="./donations.js" type="module"></script>
+    <script src="./requests.js" type="module"></script>
   </head>
   <body>
     <main class="calculator" aria-labelledby="team-name">
@@ -93,6 +94,49 @@
         <p class="free-note">Printing services are <strong>FREE</strong>.</p>
         <p>Donations are voluntary and support filament, maintenance, and future Wing Nuts projects.</p>
       </footer>
+      <details class="print-request">
+        <summary>Request a print</summary>
+        <p>Send a model link and your print details to Wing Nuts. A donation is optional.</p>
+        <p id="request-status" role="status">Print requests are not available yet</p>
+        <form id="print-request-form" method="post">
+          <fieldset id="request-fields" disabled>
+            <legend class="visually-hidden">Print request details</legend>
+            <div class="fields">
+              <div class="field">
+                <label for="request-name">Name</label>
+                <input id="request-name" name="name" autocomplete="name" maxlength="80" required>
+              </div>
+              <div class="field">
+                <label for="request-email">Reply email</label>
+                <input id="request-email" name="email" type="email" autocomplete="email" maxlength="254" required>
+              </div>
+              <div class="field">
+                <label for="model-url">Model link</label>
+                <input id="model-url" name="Model link" type="url" placeholder="https://" pattern="https?://.+" maxlength="2000" aria-describedby="model-help" required>
+                <p id="model-help">Link to your model or shared file. Make sure Wing Nuts can open it.</p>
+              </div>
+              <div class="field">
+                <label for="request-quantity">Quantity</label>
+                <input id="request-quantity" name="Quantity" type="number" min="1" max="100" step="1" value="1" required>
+              </div>
+              <div class="field">
+                <label for="request-notes">Notes (optional)</label>
+                <textarea id="request-notes" name="Notes" rows="3" maxlength="2000"></textarea>
+              </div>
+            </div>
+            <input type="hidden" name="_subject" value="6410 Wing Nuts print request">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="Design source">
+            <input type="hidden" name="Filament type">
+            <input type="hidden" name="Amount (grams)">
+            <input type="hidden" name="Print time">
+            <input type="hidden" name="Post-processing">
+            <input type="hidden" name="Suggested donation">
+            <p id="request-privacy" hidden>Request details are sent through FormSubmit to 2026frc6410@gmail.com. Continue there to complete the spam check and submit your request.</p>
+            <button id="request-submit" class="donate-button" type="submit" disabled>Send print request</button>
+          </fieldset>
+        </form>
+      </details>
       <noscript><p class="error">Enable JavaScript to calculate a suggested donation and load online donation options.</p></noscript>
     </main>
   </body>

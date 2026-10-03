@@ -54,12 +54,39 @@ Run the production gate after configuration:
 docker compose run --rm checks npm run check:production
 ```
 
+## Print-request emails
+
+The expandable **Request a print** form collects a name, reply email, model URL,
+quantity, and optional notes. It includes the calculator's design/material/time/
+finishing choices, grams, and suggested donation in the submitted request. Blank
+grams are sent as “Not provided.” A donation is not required. The form has no
+payment field and never claims that a request constitutes a completed donation.
+
+Delivery is disabled in `dist/request-config.json` until the owner approves
+FormSubmit. After approval, set `enabled` to `true` and `formEndpoint` to
+`https://formsubmit.co/2026frc6410@gmail.com`. The recipient is fixed to
+`2026frc6410@gmail.com`. FormSubmit receives the form data and forwards the email;
+the page explains that before submission. No files are uploaded to this site.
+
+Submission uses FormSubmit's hosted flow and default CAPTCHA. The provider must
+confirm recipient ownership via an activation email. Verify an authorized test
+request arrives before setting `activationConfirmed` to `true`; production
+validation blocks publication until this is done. Local tests intercept the
+provider and do not send emails or prove real delivery. The site does not claim
+inbox delivery based on a click or browser return. Browser Back restores access
+to the form after visiting the provider.
+
+PayPal's own completed-payment emails are separate. Its account and notification
+settings must be checked while signed in; print-request emails do not verify a
+donation. Account-specific PayPal eligibility and notifications remain unverified.
+
 ## Publishing
 
 The separate repository is `iFernandez96/wing-nuts-6410-donation-guide`. Enable
 GitHub Pages with **GitHub Actions** as its source. Pull requests run checks;
-successful changes on `main` run the donation-readiness check. If configuration
-is absent, the workflow reports the missing launch inputs and skips deployment.
+successful changes on `main` run the production-readiness check. If donation
+configuration or verified request delivery is absent, the workflow reports the
+missing launch inputs and skips deployment.
 Otherwise, it uploads only `dist` and deploys through the `github-pages`
 environment. No custom domain is configured.
 

@@ -208,7 +208,7 @@ async function assertLayoutFits(page) {
   const dimensions = await page.evaluate(() => ({
     viewport: document.documentElement.clientWidth,
     document: document.documentElement.scrollWidth,
-    bounds: Array.from(document.querySelectorAll('input, select, button, #donate-link, label, h1, #donation-help')).map((element) => {
+    bounds: Array.from(document.querySelectorAll('input, select, button, #donate-link, label, h1, #donation-help')).filter((element) => element.getClientRects().length > 0).map((element) => {
       const rectangle = element.getBoundingClientRect();
       return { left: rectangle.left, right: rectangle.right, width: rectangle.width };
     }),

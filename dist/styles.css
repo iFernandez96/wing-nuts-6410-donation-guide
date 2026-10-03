@@ -57,6 +57,7 @@ select { padding-right: 8px; }
 input::placeholder { color: #b5c1d1; opacity: 1; }
 input[aria-invalid="true"] { border-color: #ffb4a9; }
 input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+summary:focus-visible, textarea:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .reset-button { width: 100%; min-height: 44px; margin-top: 16px; padding: 10px; border: 1px solid var(--gold); border-radius: 8px; background: transparent; color: var(--gold); font: inherit; font-size: .875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; cursor: pointer; transition: background-color .15s, color .15s; }
 .reset-button:hover { background: var(--gold); color: var(--navy); }
 .result { margin-top: 32px; padding: 24px 12px; border-radius: 12px; background: var(--gold); color: var(--navy); text-align: center; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%); }
@@ -73,6 +74,14 @@ input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible
 .donations p { margin: 8px 0 0; font-size: .875rem; line-height: 1.5; color: #cbd5e1; overflow-wrap: anywhere; }
 .donate-button { display: block; margin-top: 14px; padding: 14px 12px; border: 2px solid var(--gold); border-radius: 8px; background: var(--gold); color: var(--navy); font-size: 1rem; line-height: 1.5; font-weight: 700; text-decoration: none; }
 .donate-button:hover { background: #dfd3a3; border-color: #dfd3a3; }
+.print-request { margin-top: 24px; border-top: 1px solid #43536b; padding-top: 16px; }
+.print-request summary { color: var(--gold); font-weight: 700; cursor: pointer; min-height: 44px; padding: 10px 0; }
+.print-request p { color: #cbd5e1; font-size: .875rem; line-height: 1.5; overflow-wrap: anywhere; }
+.print-request fieldset { border: 0; padding: 0; margin: 16px 0 0; min-width: 0; }
+.print-request textarea { display: block; width: 100%; resize: vertical; border: 1px solid #4b607d; border-radius: 8px; padding: 12px; background: #1e3a5f; color: var(--white); font: inherit; font-size: 1rem; line-height: 1.5; }
+.print-request button { width: 100%; cursor: pointer; font-family: inherit; }
+.print-request :disabled { opacity: .6; cursor: not-allowed; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 [hidden] { display: none !important; }
 @media (max-width: 360px) {
   body { padding: 12px; }
