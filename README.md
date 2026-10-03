@@ -24,86 +24,33 @@ Preview at [localhost:4173/wing-nuts-6410-donation-guide/](http://localhost:4173
 Stop the preview with `docker compose stop preview`.
 The site uses plain HTML/CSS/JavaScript without runtime npm dependencies or a
 build step. `dist` is tracked source and the complete public deployment artifact.
-The development-only Playwright suite checks the calculator, donation states,
-keyboard access, mobile layouts, text enlargement, and repository-path hosting.
+The development-only Playwright suite checks the calculator, keyboard access,
+mobile layouts, text enlargement, and repository-path hosting.
 Screenshots and test results are ignored by Git.
 
-## Configure donations
+## Current scope
 
-The draft in `dist/donation-config.json` records the requested name **Sheenal Kumar**
-and `2026frc6410@gmail.com`; these are not proof of an eligible donation recipient.
-No Venmo profile URL is configured or verified yet. Before enabling donations,
-the owner must verify an eligible Venmo charity profile and its actual recipient,
-then supply its approved HTTPS profile URL as `donationUrl`, update the recipient
-name to match, and set `recipientConfirmed` to `true`. That flag confirms both
-recipient identity and charity-profile eligibility. [Venmo's donation guidance](https://help.venmo.com/cs/articles/can-i-use-venmo-to-buy-or-sell-merchandise-goods-or-services-vhel227)
-says personal profiles should not receive funds for donation campaigns or
-nonprofits. Keep the recipient name and
-email with that URL for maintenance.
-Never put API keys, account credentials, or donor information in this file.
+The public site calculates a suggested donation only. Calculator values stay in
+the browser; there are no payment links, print-request forms, email submissions,
+accounts, or external service configuration. Online payments and request emails
+are deferred for a future update.
 
-Once confirmed, **Donate with Venmo** opens the profile in a new tab. Donors
-enter their amount on Venmo; the calculator does not transmit its suggested
-amount or any other inputs. Donation access is independent of calculator
-validation. Venmo handles payments and transaction records. This site never
-claims that a payment succeeded.
+## Publishing
 
-Incomplete, unconfirmed, failed, or invalid configuration leaves the page showing
-“Online donations are not available yet” with no active payment link. Development
-checks allow the unconfirmed draft; production remains blocked. Confirmed links
-must use HTTPS on exactly `venmo.com`, `www.venmo.com`, or `account.venmo.com`,
-without credentials or a custom port. A valid URL alone does not establish
-recipient ownership: the owner must verify the actual profile's recipient and
-donor-entered amount support before launch.
+The separate repository is `iFernandez96/wing-nuts-6410-donation-guide`. Enable
+GitHub Pages with **GitHub Actions** as its source. Pull requests run lint and
+browser tests. Passing changes on `main` also validate the static calculator,
+upload only `dist`, and deploy through the `github-pages` environment.
+No payment or email setup is required. No custom domain is configured.
 
-Run the production gate after configuration:
+Run the publication check locally:
 
 ```sh
 docker compose run --rm checks npm run check:production
 ```
 
-## Print-request emails
-
-The expandable **Request a print** form collects a name, reply email, model URL,
-quantity, and optional notes. It includes the calculator's design/material/time/
-finishing choices, grams, and suggested donation in the submitted request. Blank
-grams are sent as “Not provided.” A donation is not required. The form has no
-payment field and never claims that a request constitutes a completed donation.
-
-The owner approved FormSubmit, and delivery is configured in
-`dist/request-config.json` for local activation and verification. The recipient is fixed to
-`2026frc6410@gmail.com`. FormSubmit receives the form data and forwards the email;
-the page explains that before submission. No files are uploaded to this site.
-Activation and inbox delivery have not yet been confirmed.
-
-Submission uses FormSubmit's hosted flow and default CAPTCHA. The provider must
-confirm recipient ownership via an activation email. Verify an authorized test
-request arrives before setting `activationConfirmed` to `true`; production
-validation blocks publication until this is done. Local tests intercept the
-provider and do not send emails or prove real delivery. The site does not claim
-inbox delivery based on a click or browser return. Browser Back restores access
-to the form after visiting the provider.
-
-Completed-payment notifications come from the selected payment provider or bank.
-Verify its recipient and email notification settings before launch; print-request
-emails do not verify a donation. The website cannot detect payment completion
-from an outbound link or payment instructions.
-
-## Publishing
-
-The separate repository is `iFernandez96/wing-nuts-6410-donation-guide`. Enable
-GitHub Pages with **GitHub Actions** as its source. Pull requests run checks;
-successful changes on `main` run the production-readiness check. If donation
-configuration or verified request delivery is absent, the workflow reports the
-missing launch inputs and skips deployment.
-Otherwise, it uploads only `dist` and deploys through the `github-pages`
-environment. No custom domain is configured.
-
-Review the local preview and verify the approved recipient before the first
-public deployment. After deployment, use the URL returned by the Pages action
-to check the calculator, assets, and donation destination; no real donation is
-needed to verify navigation. Payment completion/cancellation and receipt behavior
-belong to the organization's hosted provider, not this static site's test suite.
+Review the local preview before the first public deployment. After deployment,
+use the URL returned by the Pages action to check the calculator and its assets.
 To roll back a site change, revert its commit and let the same checks redeploy.
 
 ## Calculator behavior

@@ -1,10 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const donationUrl = 'https://venmo.com/u/TEST-ONLY-NOT-A-REAL-RECIPIENT';
-const configured = { recipientName: 'Sheenal Kumar', recipientEmail: '2026frc6410@gmail.com', donationUrl, recipientConfirmed: true };
-
-async function openGuide(page, configuration = {}) {
-  await page.route('**/donation-config.json', (route) => route.fulfill({ json: configuration }));
+async function openGuide(page) {
   await page.goto('./');
   await page.waitForLoadState('networkidle');
 }
@@ -77,84 +73,8 @@ test('rejects an incomplete numeric entry and recovers on valid input', async ({
   await expect(page.locator('#total')).toHaveText('$4.50');
 });
 
-test('donation works independently, opens the correct recipient, and preserves calculator state', async ({ page, context }) => {
-  await context.route(donationUrl, (route) => route.fulfill({
-    contentType: 'text/html',
-    body: '<title>Test donation destination</title><p>Hosted payment placeholder</p>',
-  }));
-  await openGuide(page, configured);
-  const link = page.getByRole('link', { name: /Donate with Venmo/ });
-  await expect(link).toBeVisible();
-  await expect(page.locator('#donation-recipient')).toContainText(configured.recipientName);
-  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on Venmo.');
-  await expect(link).toHaveAttribute('href', donationUrl);
-  await expect(link).toHaveAttribute('target', '_blank');
-  await expect(link).toHaveAttribute('rel', /noopener/);
-  await expect(link).toHaveAttribute('rel', /noreferrer/);
-  await expect(link).toHaveAccessibleDescription(/new tab/i);
-
-  const initialPopupPromise = page.waitForEvent('popup');
-  await link.click();
-  const initialPopup = await initialPopupPromise;
-  await expect(initialPopup).toHaveURL(donationUrl);
-  await initialPopup.close();
-
-  await page.locator('#grams').fill('-1');
-  await expect(page.locator('#grams-error')).toBeVisible();
-  await expect(link).toBeVisible();
-  const popupPromise = page.waitForEvent('popup');
-  await link.click();
-  const popup = await popupPromise;
-  await expect(popup).toHaveURL(donationUrl);
-  await expect(page.locator('#grams')).toHaveValue('-1');
-  await expect(page.locator('#grams-error')).toBeVisible();
-  await expect(page.locator('#donation-status')).not.toContainText(/success|received|thank you/i);
-  await expect(page.getByText(/payment successful|donation received|thank you for (your )?donat/i)).toHaveCount(0);
-});
-
-test('accepts a confirmed shared profile on the exact Venmo account host', async ({ page }) => {
-  const sharedProfile = 'https://account.venmo.com/u/TEST-ONLY-NOT-A-REAL-RECIPIENT';
-  await openGuide(page, { ...configured, donationUrl: sharedProfile });
-  await expect(page.getByRole('link', { name: 'Donate with Venmo' })).toHaveAttribute('href', sharedProfile);
-  await expect(page.locator('#donation-recipient')).toContainText(configured.recipientName);
-});
-
-for (const configuration of [
-  { name: 'empty', value: {} },
-  { name: 'missing recipient', value: { ...configured, recipientName: '' } },
-  { name: 'unconfirmed recipient', value: { ...configured, recipientConfirmed: false } },
-  { name: 'draft without profile URL', value: { ...configured, donationUrl: '', recipientConfirmed: false } },
-  { name: 'different recipient email', value: { ...configured, recipientEmail: 'unapproved@example.org' } },
-  { name: 'non-HTTPS', value: { ...configured, donationUrl: 'http://venmo.com/u/TEST-ONLY' } },
-  { name: 'untrusted host', value: { ...configured, donationUrl: 'https://donate.example.org/TEST-ONLY' } },
-  { name: 'Venmo lookalike host', value: { ...configured, donationUrl: 'https://venmo.com.example.org/TEST-ONLY' } },
-  { name: 'unapproved Venmo subdomain', value: { ...configured, donationUrl: 'https://unapproved.venmo.com/TEST-ONLY' } },
-  { name: 'credentials in URL', value: { ...configured, donationUrl: 'https://user@venmo.com/u/TEST-ONLY' } },
-  { name: 'homepage without profile', value: { ...configured, donationUrl: 'https://venmo.com/' } },
-  { name: 'script URL', value: { ...configured, donationUrl: 'javascript:alert(1)' } },
-  { name: 'malformed URL', value: { ...configured, donationUrl: 'not a URL' } },
-]) {
-  test(`${configuration.name} configuration shows no active payment link`, async ({ page }) => {
-    await openGuide(page, configuration.value);
-    await expect(page.locator('#donation-status')).toHaveText('Online donations are not available yet');
-    await expect(page.getByRole('link', { name: /Donate with Venmo/ })).toHaveCount(0);
-    await expect(page.locator('#donate-link')).not.toHaveAttribute('href', /.+/);
-    await expect(page.locator('#total')).toHaveText('$3.00');
-  });
-}
-
-test('missing configuration leaves the calculator usable', async ({ page }) => {
-  await page.route('**/donation-config.json', (route) => route.fulfill({ status: 404, body: 'Not found' }));
-  await page.goto('./');
-  await page.waitForLoadState('networkidle');
-  await expect(page.locator('#donation-status')).toHaveText('Online donations are not available yet');
-  await expect(page.getByRole('link', { name: /Donate with Venmo/ })).toHaveCount(0);
-  await page.locator('#grams').fill('50');
-  await expect(page.locator('#total')).toHaveText('$4.50');
-});
-
 test('labels, result announcement, and keyboard focus are accessible', async ({ page }) => {
-  await openGuide(page, configured);
+  await openGuide(page);
   await expect(page.getByRole('heading', { name: 'Wing Nuts', exact: true })).toBeVisible();
   for (const label of ['1. Design Source', '2. Filament Type', '3. Amount (Grams)', '4. Print Time', '5. Post-Processing & Labor']) {
     await expect(page.getByLabel(label, { exact: true })).toBeVisible();
@@ -162,7 +82,6 @@ test('labels, result announcement, and keyboard focus are accessible', async ({ 
   await expect(page.locator('.result')).toHaveAttribute('aria-live', 'polite');
   await expect(page.locator('.result')).toHaveAttribute('aria-atomic', 'true');
   await expect(page.locator('#grams')).toHaveAttribute('aria-describedby', /grams-error/);
-  await page.locator('#donate-link').waitFor({ state: 'visible' });
   for (const id of ['design', 'filament', 'grams', 'time', 'post']) {
     await page.keyboard.press('Tab');
     await expect(page.locator(`#${id}`)).toBeFocused();
@@ -170,9 +89,7 @@ test('labels, result announcement, and keyboard focus are accessible', async ({ 
   }
   await page.keyboard.press('Tab');
   await expect(page.getByRole('button', { name: 'Reset Calculator' })).toBeFocused();
-  await page.keyboard.press('Tab');
-  await expect(page.locator('#donate-link')).toBeFocused();
-  expect(await page.locator('#donate-link').evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
+  expect(await page.getByRole('button', { name: 'Reset Calculator' }).evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe('none');
 });
 
 test('loads assets from the repository path without runtime errors', async ({ page }) => {
@@ -184,11 +101,10 @@ test('loads assets from the repository path without runtime errors', async ({ pa
       loadedAssets.push({ path: new URL(response.url()).pathname, status: response.status() });
     }
   });
-  await openGuide(page, configured);
-  await expect(page.locator('#donate-link')).toBeVisible();
+  await openGuide(page);
   await page.locator('#grams').fill('50');
   await expect(page.locator('#total')).toHaveText('$4.50');
-  for (const asset of ['styles.css', 'calculator.js', 'donations.js']) {
+  for (const asset of ['styles.css', 'calculator.js']) {
     expect(loadedAssets).toContainEqual({ path: `/wing-nuts-6410-donation-guide/${asset}`, status: 200 });
   }
   expect(errors).toEqual([]);
@@ -197,8 +113,7 @@ test('loads assets from the repository path without runtime errors', async ({ pa
 for (const viewport of [{ width: 320, height: 800 }, { width: 375, height: 812 }, { width: 1280, height: 1000 }]) {
   test(`layout fits ${viewport.width}px and exposes all controls`, async ({ page }, testInfo) => {
     await page.setViewportSize(viewport);
-    await openGuide(page, configured);
-    await expect(page.locator('#donate-link')).toBeVisible();
+    await openGuide(page);
     await assertLayoutFits(page);
     if (viewport.width !== 320) {
       await page.screenshot({ path: testInfo.outputPath(`${viewport.width === 375 ? 'mobile' : 'desktop'}-guide.png`), fullPage: true });
@@ -208,13 +123,11 @@ for (const viewport of [{ width: 320, height: 800 }, { width: 375, height: 812 }
 
 test('200% text sizing preserves controls and readable content', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 1000 });
-  await openGuide(page, configured);
+  await openGuide(page);
   await page.addStyleTag({ content: 'html { font-size: 200%; }' });
-  await expect(page.locator('#donate-link')).toBeVisible();
   await assertLayoutFits(page);
   await page.locator('#grams').fill('50');
   await expect(page.locator('#total')).toHaveText('$4.50');
-  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on Venmo.');
   await page.getByRole('button', { name: 'Reset Calculator' }).click();
   await expect(page.locator('#total')).toHaveText('$3.00');
 });
@@ -223,7 +136,7 @@ async function assertLayoutFits(page) {
   const dimensions = await page.evaluate(() => ({
     viewport: document.documentElement.clientWidth,
     document: document.documentElement.scrollWidth,
-    bounds: Array.from(document.querySelectorAll('input, select, button, #donate-link, label, h1, #donation-help')).filter((element) => element.getClientRects().length > 0).map((element) => {
+    bounds: Array.from(document.querySelectorAll('input, select, button, label, h1, .donation-note')).filter((element) => element.getClientRects().length > 0).map((element) => {
       const rectangle = element.getBoundingClientRect();
       return { left: rectangle.left, right: rectangle.right, width: rectangle.width };
     }),
