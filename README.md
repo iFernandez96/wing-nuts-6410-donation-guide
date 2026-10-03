@@ -37,11 +37,12 @@ are deferred for a future update.
 
 ## Publishing
 
-The separate repository is `iFernandez96/wing-nuts-6410-donation-guide`. Enable
-GitHub Pages with **GitHub Actions** as its source. Pull requests run lint and
-browser tests. Passing changes on `main` also validate the static calculator,
-upload only `dist`, and deploy through the `github-pages` environment.
-No payment or email setup is required. No custom domain is configured.
+The source repository remains `iFernandez96/wing-nuts-6410-donation-guide`.
+The public calculator is [wing-nuts-6410.pages.dev](https://wing-nuts-6410.pages.dev/)
+on **Cloudflare Pages**, in the `wing-nuts-6410` project.
+GitHub Actions runs lint, browser tests, and static publication checks
+on pull requests and changes to `main`; it does not deploy to GitHub Pages.
+No payment or email setup is required. No purchased domain is needed.
 
 Run the publication check locally:
 
@@ -49,9 +50,16 @@ Run the publication check locally:
 docker compose run --rm checks npm run check:production
 ```
 
-Review the local preview before the first public deployment. After deployment,
-use the URL returned by the Pages action to check the calculator and its assets.
-To roll back a site change, revert its commit and let the same checks redeploy.
+After checks pass, upload the contents of `dist` to the existing Cloudflare Pages
+project using **Create a new deployment** and the production environment.
+Cloudflare's Direct Upload accepts a folder or a ZIP with `index.html` at its root.
+Only the three public files in `dist` belong in the upload. Source code pushes
+do not automatically publish this Direct Upload project.
+
+Review locally before publishing, then use the returned production URL to check
+the calculator and its assets. To roll back, select a previous successful
+production deployment in Cloudflare Pages or upload a previously verified
+version of `dist`.
 
 ## Calculator behavior
 

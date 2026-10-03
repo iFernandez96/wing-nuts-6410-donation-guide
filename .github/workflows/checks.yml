@@ -1,0 +1,27 @@
+name: Check donation guide
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Lint and browser tests
+        run: docker compose run --rm checks
+
+      - name: Verify static calculator for publication
+        run: docker compose run --rm checks npm run check:production
