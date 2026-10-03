@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#13294b">
+    <meta name="description" content="Estimate a voluntary donation for 3D printing with Wing Nuts, FRC Team 6410. Choose your design, material, print time, and finishing needs.">
+    <title>6410 Wing Nuts | 3D Printing Donation Guide</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2313294b'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='Arial,sans-serif' font-size='24' font-weight='bold' fill='%23c5b783'%3E6410%3C/text%3E%3C/svg%3E">
+    <link rel="stylesheet" href="./styles.css">
+    <script src="./calculator.js" defer></script>
+    <script src="./donations.js" type="module"></script>
+  </head>
+  <body>
+    <main class="calculator" aria-labelledby="team-name">
+      <header class="heading">
+        <h1 id="team-name">Wing Nuts</h1>
+        <p class="team-number">FRC Team 6410</p>
+        <div class="divider" aria-hidden="true"></div>
+        <p class="guide-title">3D Printing Donation Guide</p>
+      </header>
+
+      <form id="donation-form">
+        <div class="fields">
+          <div class="field">
+            <label for="design">1. Design Source</label>
+            <select id="design" name="design">
+              <option value="1">Personal Design ($1)</option>
+              <option value="2">Online Design ($2)</option>
+              <option value="5.5">Team-Assisted/Modified ($5.50)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="filament">2. Filament Type</label>
+            <select id="filament" name="filament">
+              <option value="0.05">PLA ($0.50 / 10g)</option>
+              <option value="0.075">PETG ($0.75 / 10g)</option>
+              <option value="0.10">ABS ($1.00 / 10g)</option>
+              <option value="0.125">TPU/Specialty ($1.25 / 10g)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="grams">3. Amount (Grams)</label>
+            <input type="number" id="grams" name="grams" min="0" step="any" inputmode="decimal" placeholder="Enter grams used" aria-describedby="grams-error">
+            <p id="grams-error" class="error" hidden>Enter a valid amount of 0 grams or more.</p>
+          </div>
+
+          <div class="field">
+            <label for="time">4. Print Time</label>
+            <select id="time" name="time">
+              <option value="1">Under 1 hour ($1)</option>
+              <option value="3">1–3 hours ($3)</option>
+              <option value="6.5">3–6 hours ($6.50)</option>
+              <option value="10">6–12 hours ($10)</option>
+              <option value="15">12–24 hours ($15)</option>
+              <option value="25">Over 24 hours ($25+)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="post">5. Post-Processing &amp; Labor</label>
+            <select id="post" name="post">
+              <option value="0">None ($0)</option>
+              <option value="1.5">Light Support Removal ($1.50)</option>
+              <option value="4">Detailed Cleanup/Sanding ($4)</option>
+              <option value="6">Major/Heavy Support Removal ($6)</option>
+              <option value="10">Complex/Internal Support Release ($10)</option>
+              <option value="15">Full Assembly &amp; Painting ($15)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="reset" class="reset-button">Reset Calculator</button>
+
+        <section class="result" aria-labelledby="result-label" aria-live="polite" aria-atomic="true">
+          <h2 id="result-label">Suggested Donation</h2>
+          <output id="total" for="design filament grams time post">$3.00</output>
+          <p id="min-msg">Minimum suggested donation ($3.00) applied</p>
+        </section>
+      </form>
+
+      <section class="donations" aria-labelledby="donations-heading">
+        <h2 id="donations-heading">Online donations</h2>
+        <p id="donation-status" role="status">Online donations are not available yet</p>
+        <p id="donation-recipient" hidden></p>
+        <a id="donate-link" class="donate-button" target="_blank" rel="noopener noreferrer" aria-describedby="donation-help" hidden>Donate to Wing Nuts</a>
+        <p id="donation-help" hidden>Enter your chosen donation amount on the payment page. Opens in a new tab.</p>
+      </section>
+
+      <footer class="donation-note">
+        <p class="free-note">Printing services are <strong>FREE</strong>.</p>
+        <p>Donations are voluntary and support filament, maintenance, and future Wing Nuts projects.</p>
+      </footer>
+      <noscript><p class="error">Enable JavaScript to calculate a suggested donation and load online donation options.</p></noscript>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,84 @@
+:root {
+  color-scheme: dark;
+  --navy: #13294b;
+  --gold: #c5b783;
+  --white: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--navy);
+  color: var(--white);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-width: 280px;
+  min-height: 100vh;
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.calculator {
+  width: 100%;
+  max-width: 448px;
+  margin: 16px 0;
+  padding: 24px;
+  background: rgb(255 255 255 / 5%);
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
+}
+
+.heading { text-align: center; margin-bottom: 24px; }
+h1 { margin: 0; font-size: 2rem; line-height: 1.1; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; color: var(--gold); }
+.team-number { margin: 6px 0 0; font-size: 1rem; font-weight: 700; }
+.divider { width: 96px; height: 4px; margin: 10px auto 0; background: var(--white); border-radius: 8px; }
+.guide-title { margin: 14px 0 0; color: #cbd5e1; font-size: .875rem; line-height: 1.5; }
+.fields { display: grid; gap: 16px; }
+.field { min-width: 0; }
+label { display: block; margin-bottom: 6px; font-size: .875rem; line-height: 1.4; font-weight: 700; text-transform: uppercase; color: var(--gold); }
+input, select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #4b607d;
+  border-radius: 8px;
+  background: #1e3a5f;
+  color: var(--white);
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+select { padding-right: 8px; }
+input::placeholder { color: #b5c1d1; opacity: 1; }
+input[aria-invalid="true"] { border-color: #ffb4a9; }
+input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.reset-button { width: 100%; min-height: 44px; margin-top: 16px; padding: 10px; border: 1px solid var(--gold); border-radius: 8px; background: transparent; color: var(--gold); font: inherit; font-size: .875rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; cursor: pointer; transition: background-color .15s, color .15s; }
+.reset-button:hover { background: var(--gold); color: var(--navy); }
+.result { margin-top: 32px; padding: 24px 12px; border-radius: 12px; background: var(--gold); color: var(--navy); text-align: center; box-shadow: 0 10px 15px -3px rgb(0 0 0 / 10%); }
+.result h2 { margin: 0; font-size: .875rem; line-height: 1.4; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+#total { display: block; margin-top: 5px; font-size: clamp(2rem, 10vw, 3rem); line-height: 1.1; font-weight: 900; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+#min-msg { margin: 10px 0 0; font-size: .875rem; line-height: 1.4; font-style: italic; font-weight: 700; }
+.donation-note { margin-top: 32px; padding-top: 16px; border-top: 1px solid #43536b; text-align: center; }
+.donation-note p { margin: 8px 0 0; font-size: .875rem; line-height: 1.5; color: #cbd5e1; }
+.donation-note .free-note { margin-top: 0; font-size: 1rem; color: var(--white); }
+.free-note strong { text-decoration: underline; font-size: 1.125rem; }
+.error { margin: 8px 0 0; font-size: .875rem; line-height: 1.5; color: #ffb4a9; }
+.donations { margin-top: 24px; text-align: center; }
+.donations h2 { margin: 0; font-size: 1rem; line-height: 1.5; color: var(--gold); }
+.donations p { margin: 8px 0 0; font-size: .875rem; line-height: 1.5; color: #cbd5e1; overflow-wrap: anywhere; }
+.donate-button { display: block; margin-top: 14px; padding: 14px 12px; border: 2px solid var(--gold); border-radius: 8px; background: var(--gold); color: var(--navy); font-size: 1rem; line-height: 1.5; font-weight: 700; text-decoration: none; }
+.donate-button:hover { background: #dfd3a3; border-color: #dfd3a3; }
+[hidden] { display: none !important; }
+@media (max-width: 360px) {
+  body { padding: 12px; }
+  .calculator { margin: 8px 0; padding: 18px 14px; }
+  select { font-size: .875rem; padding-left: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reset-button { transition: none; }
+}

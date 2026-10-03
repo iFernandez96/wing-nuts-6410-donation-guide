@@ -1,0 +1,16 @@
+{
+  "name": "wing-nuts-6410-donation-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Wing Nuts, FRC Team 6410, 3D printing donation guide",
+  "scripts": {
+    "lint": "node --check dist/calculator.js && node --check dist/donations.js && node --check dist/donation-config.js && node scripts/validate-site.mjs",
+    "test": "playwright test",
+    "check:production": "node scripts/validate-site.mjs --production",
+    "start": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  }
+}

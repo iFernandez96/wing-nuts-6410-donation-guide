@@ -1,0 +1,24 @@
+x-development: &development
+  build: .
+  working_dir: /app
+  volumes:
+    - .:/app
+    - dependencies:/app/node_modules
+
+services:
+  checks:
+    <<: *development
+    shm_size: 1gb
+    command: ["sh", "-c", "npm ci && npm run lint && npm test"]
+
+  preview:
+    <<: *development
+    environment:
+      HOST: 0.0.0.0
+      PORT: 4173
+    ports:
+      - "127.0.0.1:4173:4173"
+    command: ["node", "scripts/serve.mjs"]
+
+volumes:
+  dependencies:

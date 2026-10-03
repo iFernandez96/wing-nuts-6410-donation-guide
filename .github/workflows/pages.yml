@@ -1,0 +1,67 @@
+name: Check and publish donation guide
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Lint and browser tests
+        run: docker compose run --rm checks
+
+  publish-readiness:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: checks
+    runs-on: ubuntu-latest
+    outputs:
+      ready: ${{ steps.readiness.outputs.ready }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Confirm approved donation recipient and URL
+        id: readiness
+        shell: bash
+        run: |
+          if docker compose run --rm checks npm run check:production; then
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
+            echo 'Donation configuration is ready for publication.' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'ready=false' >> "$GITHUB_OUTPUT"
+            echo '### Publication paused' >> "$GITHUB_STEP_SUMMARY"
+            echo 'The site passed its checks, but production validation did not pass. Configure the approved donation recipient and HTTPS donation URL before publication. See the validation output above.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload static website only
+        if: steps.readiness.outputs.ready == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    if: needs.publish-readiness.outputs.ready == 'true'
+    needs: publish-readiness
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
