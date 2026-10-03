@@ -38,8 +38,8 @@ are deferred for a future update.
 ## Publishing
 
 The source repository remains `iFernandez96/wing-nuts-6410-donation-guide`.
-The public calculator is [wing-nuts-6410.pages.dev](https://wing-nuts-6410.pages.dev/)
-on **Cloudflare Pages**, in the `wing-nuts-6410` project.
+The public calculator is [wingnuts6410-printing.pages.dev](https://wingnuts6410-printing.pages.dev/)
+on **Cloudflare Pages**, in the `wingnuts6410-printing` project.
 GitHub Actions runs lint, browser tests, and static publication checks
 on pull requests and changes to `main`; it does not deploy to GitHub Pages.
 No payment or email setup is required. No purchased domain is needed.
@@ -60,6 +60,11 @@ Review locally before publishing, then use the returned production URL to check
 the calculator and its assets. To roll back, select a previous successful
 production deployment in Cloudflare Pages or upload a previously verified
 version of `dist`.
+
+The former `wing-nuts-6410.pages.dev` address redirects to the new address.
+Its separate Cloudflare project, `wing-nuts-6410`, receives only the files in
+`hosting/old-address-redirect`; do not upload that redirect bundle to the current
+calculator project. The redirect preserves paths for previously shared links.
 
 ## Calculator behavior
 
