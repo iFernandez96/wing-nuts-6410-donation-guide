@@ -30,23 +30,31 @@ Screenshots and test results are ignored by Git.
 
 ## Configure donations
 
-Edit `dist/donation-config.json` with the organization's **approved** recipient
-display name and full HTTPS hosted donation URL. Both values must be set together.
-The public configuration is intentionally blank until supplied by the owner.
+The draft in `dist/donation-config.json` records the requested name **Sheenal Kumar**
+and `2026frc6410@gmail.com`; these are not proof of an eligible donation recipient.
+No Venmo profile URL is configured or verified yet. Before enabling donations,
+the owner must verify an eligible Venmo charity profile and its actual recipient,
+then supply its approved HTTPS profile URL as `donationUrl`, update the recipient
+name to match, and set `recipientConfirmed` to `true`. That flag confirms both
+recipient identity and charity-profile eligibility. [Venmo's donation guidance](https://help.venmo.com/cs/articles/can-i-use-venmo-to-buy-or-sell-merchandise-goods-or-services-vhel227)
+says personal profiles should not receive funds for donation campaigns or
+nonprofits. Keep the recipient name and
+email with that URL for maintenance.
 Never put API keys, account credentials, or donor information in this file.
 
-Once configured, **Donate to Wing Nuts** opens the provider's page in a new tab.
-Donors enter their amount there; the calculator does not transmit its suggested
+Once confirmed, **Donate with Venmo** opens the profile in a new tab. Donors
+enter their amount on Venmo; the calculator does not transmit its suggested
 amount or any other inputs. Donation access is independent of calculator
-validation. The provider handles payment processing, receipts, and records.
-This site never claims that a payment succeeded.
+validation. Venmo handles payments and transaction records. This site never
+claims that a payment succeeded.
 
-Missing, failed, or invalid configuration leaves the page showing
-“Online donations are not available yet” with no active payment link. The
-production check rejects missing or invalid configuration; it also rejects
-non-HTTPS URLs, credentials in URLs, and common placeholder domains. A valid URL
-alone does not establish recipient ownership: the owner must verify the actual
-provider page's recipient and donor-entered amount support before launch.
+Incomplete, unconfirmed, failed, or invalid configuration leaves the page showing
+“Online donations are not available yet” with no active payment link. Development
+checks allow the unconfirmed draft; production remains blocked. Confirmed links
+must use HTTPS on exactly `venmo.com`, `www.venmo.com`, or `account.venmo.com`,
+without credentials or a custom port. A valid URL alone does not establish
+recipient ownership: the owner must verify the actual profile's recipient and
+donor-entered amount support before launch.
 
 Run the production gate after configuration:
 
@@ -62,11 +70,11 @@ finishing choices, grams, and suggested donation in the submitted request. Blank
 grams are sent as “Not provided.” A donation is not required. The form has no
 payment field and never claims that a request constitutes a completed donation.
 
-Delivery is disabled in `dist/request-config.json` until the owner approves
-FormSubmit. After approval, set `enabled` to `true` and `formEndpoint` to
-`https://formsubmit.co/2026frc6410@gmail.com`. The recipient is fixed to
+The owner approved FormSubmit, and delivery is configured in
+`dist/request-config.json` for local activation and verification. The recipient is fixed to
 `2026frc6410@gmail.com`. FormSubmit receives the form data and forwards the email;
 the page explains that before submission. No files are uploaded to this site.
+Activation and inbox delivery have not yet been confirmed.
 
 Submission uses FormSubmit's hosted flow and default CAPTCHA. The provider must
 confirm recipient ownership via an activation email. Verify an authorized test
@@ -76,9 +84,10 @@ provider and do not send emails or prove real delivery. The site does not claim
 inbox delivery based on a click or browser return. Browser Back restores access
 to the form after visiting the provider.
 
-PayPal's own completed-payment emails are separate. Its account and notification
-settings must be checked while signed in; print-request emails do not verify a
-donation. Account-specific PayPal eligibility and notifications remain unverified.
+Completed-payment notifications come from the selected payment provider or bank.
+Verify its recipient and email notification settings before launch; print-request
+emails do not verify a donation. The website cannot detect payment completion
+from an outbound link or payment instructions.
 
 ## Publishing
 

@@ -1,6 +1,9 @@
 /** Public configuration only: never place credentials in the static website. */
 export function readDonationConfig(config) {
-  if (!config || typeof config.recipientName !== 'string' || typeof config.donationUrl !== 'string') {
+  // The owner confirms both the actual recipient and eligible charity profile.
+  if (!config || config.recipientConfirmed !== true ||
+      typeof config.recipientName !== 'string' || typeof config.donationUrl !== 'string' ||
+      config.recipientEmail !== '2026frc6410@gmail.com') {
     return null;
   }
 
@@ -10,13 +13,10 @@ export function readDonationConfig(config) {
 
   try {
     const url = new URL(donationUrl);
-    if (url.protocol !== 'https:' || url.username || url.password) return null;
+    if (url.protocol !== 'https:' || url.username || url.password || url.port) return null;
     const hostname = url.hostname.toLowerCase();
-    if (!hostname.includes('.') || hostname.endsWith('.invalid') || hostname.endsWith('.test') ||
-        /(^|\.)example\.(com|org|net)$/.test(hostname) || hostname === '127.0.0.1' || hostname === '[::1]') {
-      return null;
-    }
-    return { recipientName, donationUrl: url.href };
+    if (!['venmo.com', 'www.venmo.com', 'account.venmo.com'].includes(hostname) || url.pathname === '/') return null;
+    return { recipientName, recipientEmail: config.recipientEmail, donationUrl: url.href };
   } catch {
     return null;
   }

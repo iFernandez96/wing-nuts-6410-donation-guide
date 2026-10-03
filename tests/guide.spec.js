@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=TEST_ONLY';
-const configured = { recipientName: 'Wing Nuts Robotics Boosters', donationUrl };
+const donationUrl = 'https://venmo.com/u/TEST-ONLY-NOT-A-REAL-RECIPIENT';
+const configured = { recipientName: 'Sheenal Kumar', recipientEmail: '2026frc6410@gmail.com', donationUrl, recipientConfirmed: true };
 
 async function openGuide(page, configuration = {}) {
   await page.route('**/donation-config.json', (route) => route.fulfill({ json: configuration }));
@@ -83,10 +83,10 @@ test('donation works independently, opens the correct recipient, and preserves c
     body: '<title>Test donation destination</title><p>Hosted payment placeholder</p>',
   }));
   await openGuide(page, configured);
-  const link = page.getByRole('link', { name: /Donate to Wing Nuts/ });
+  const link = page.getByRole('link', { name: /Donate with Venmo/ });
   await expect(link).toBeVisible();
   await expect(page.locator('#donation-recipient')).toContainText(configured.recipientName);
-  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on the payment page.');
+  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on Venmo.');
   await expect(link).toHaveAttribute('href', donationUrl);
   await expect(link).toHaveAttribute('target', '_blank');
   await expect(link).toHaveAttribute('rel', /noopener/);
@@ -112,17 +112,32 @@ test('donation works independently, opens the correct recipient, and preserves c
   await expect(page.getByText(/payment successful|donation received|thank you for (your )?donat/i)).toHaveCount(0);
 });
 
+test('accepts a confirmed shared profile on the exact Venmo account host', async ({ page }) => {
+  const sharedProfile = 'https://account.venmo.com/u/TEST-ONLY-NOT-A-REAL-RECIPIENT';
+  await openGuide(page, { ...configured, donationUrl: sharedProfile });
+  await expect(page.getByRole('link', { name: 'Donate with Venmo' })).toHaveAttribute('href', sharedProfile);
+  await expect(page.locator('#donation-recipient')).toContainText(configured.recipientName);
+});
+
 for (const configuration of [
-  { name: 'empty', value: { recipientName: '', donationUrl: '' } },
-  { name: 'missing recipient', value: { recipientName: '', donationUrl } },
-  { name: 'non-HTTPS', value: { recipientName: 'Wing Nuts', donationUrl: 'http://donate.example.org/' } },
-  { name: 'script URL', value: { recipientName: 'Wing Nuts', donationUrl: 'javascript:alert(1)' } },
-  { name: 'malformed URL', value: { recipientName: 'Wing Nuts', donationUrl: 'not a URL' } },
+  { name: 'empty', value: {} },
+  { name: 'missing recipient', value: { ...configured, recipientName: '' } },
+  { name: 'unconfirmed recipient', value: { ...configured, recipientConfirmed: false } },
+  { name: 'draft without profile URL', value: { ...configured, donationUrl: '', recipientConfirmed: false } },
+  { name: 'different recipient email', value: { ...configured, recipientEmail: 'unapproved@example.org' } },
+  { name: 'non-HTTPS', value: { ...configured, donationUrl: 'http://venmo.com/u/TEST-ONLY' } },
+  { name: 'untrusted host', value: { ...configured, donationUrl: 'https://donate.example.org/TEST-ONLY' } },
+  { name: 'Venmo lookalike host', value: { ...configured, donationUrl: 'https://venmo.com.example.org/TEST-ONLY' } },
+  { name: 'unapproved Venmo subdomain', value: { ...configured, donationUrl: 'https://unapproved.venmo.com/TEST-ONLY' } },
+  { name: 'credentials in URL', value: { ...configured, donationUrl: 'https://user@venmo.com/u/TEST-ONLY' } },
+  { name: 'homepage without profile', value: { ...configured, donationUrl: 'https://venmo.com/' } },
+  { name: 'script URL', value: { ...configured, donationUrl: 'javascript:alert(1)' } },
+  { name: 'malformed URL', value: { ...configured, donationUrl: 'not a URL' } },
 ]) {
   test(`${configuration.name} configuration shows no active payment link`, async ({ page }) => {
     await openGuide(page, configuration.value);
     await expect(page.locator('#donation-status')).toHaveText('Online donations are not available yet');
-    await expect(page.getByRole('link', { name: /Donate to Wing Nuts/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Donate with Venmo/ })).toHaveCount(0);
     await expect(page.locator('#donate-link')).not.toHaveAttribute('href', /.+/);
     await expect(page.locator('#total')).toHaveText('$3.00');
   });
@@ -133,7 +148,7 @@ test('missing configuration leaves the calculator usable', async ({ page }) => {
   await page.goto('./');
   await page.waitForLoadState('networkidle');
   await expect(page.locator('#donation-status')).toHaveText('Online donations are not available yet');
-  await expect(page.getByRole('link', { name: /Donate to Wing Nuts/ })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /Donate with Venmo/ })).toHaveCount(0);
   await page.locator('#grams').fill('50');
   await expect(page.locator('#total')).toHaveText('$4.50');
 });
@@ -199,7 +214,7 @@ test('200% text sizing preserves controls and readable content', async ({ page }
   await assertLayoutFits(page);
   await page.locator('#grams').fill('50');
   await expect(page.locator('#total')).toHaveText('$4.50');
-  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on the payment page.');
+  await expect(page.locator('#donation-help')).toContainText('Enter your chosen donation amount on Venmo.');
   await page.getByRole('button', { name: 'Reset Calculator' }).click();
   await expect(page.locator('#total')).toHaveText('$3.00');
 });

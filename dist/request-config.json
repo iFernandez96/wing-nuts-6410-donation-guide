@@ -1,6 +1,6 @@
 {
   "recipientEmail": "2026frc6410@gmail.com",
-  "formEndpoint": "",
-  "enabled": false,
+  "formEndpoint": "https://formsubmit.co/2026frc6410@gmail.com",
+  "enabled": true,
   "activationConfirmed": false
 }

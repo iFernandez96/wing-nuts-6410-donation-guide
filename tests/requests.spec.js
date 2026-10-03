@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test';
 const recipientEmail = '2026frc6410@gmail.com';
 const formEndpoint = `https://formsubmit.co/${recipientEmail}`;
 const requestConfiguration = { recipientEmail, formEndpoint, enabled: true };
-const donationUrl = 'https://www.paypal.com/donate/?hosted_button_id=TEST_ONLY';
+const donationUrl = 'https://venmo.com/u/TEST-ONLY-NOT-A-REAL-RECIPIENT';
+const donationConfiguration = { recipientName: 'Sheenal Kumar', recipientEmail, donationUrl, recipientConfirmed: true };
 
 test.beforeEach(async ({ context }) => {
   // All provider traffic stays inside the test. No request or email is sent.
@@ -11,7 +12,7 @@ test.beforeEach(async ({ context }) => {
     contentType: 'text/html',
     body: '<title>Intercepted request destination</title><p>Test provider response</p>',
   }));
-  await context.route('https://www.paypal.com/**', (route) => route.fulfill({
+  await context.route('https://venmo.com/**', (route) => route.fulfill({
     contentType: 'text/html',
     body: '<title>Intercepted donation destination</title>',
   }));
@@ -20,7 +21,7 @@ test.beforeEach(async ({ context }) => {
 async function openGuide(page, configuration = requestConfiguration) {
   await page.route('**/request-config.json', (route) => route.fulfill({ json: configuration }));
   await page.route('**/donation-config.json', (route) => route.fulfill({
-    json: { recipientName: 'Wing Nuts', donationUrl },
+    json: donationConfiguration,
   }));
   await page.goto('./');
   await page.waitForLoadState('networkidle');
@@ -55,7 +56,7 @@ for (const configuration of [
 
 test('unreachable request configuration preserves calculator and donation access', async ({ page }) => {
   await page.route('**/request-config.json', (route) => route.fulfill({ status: 404, body: 'Not found' }));
-  await page.route('**/donation-config.json', (route) => route.fulfill({ json: { recipientName: 'Wing Nuts', donationUrl } }));
+  await page.route('**/donation-config.json', (route) => route.fulfill({ json: donationConfiguration }));
   await page.goto('./');
   await page.waitForLoadState('networkidle');
   await page.getByText('Request a print', { exact: true }).click();
