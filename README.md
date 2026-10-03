@@ -61,10 +61,8 @@ the calculator and its assets. To roll back, select a previous successful
 production deployment in Cloudflare Pages or upload a previously verified
 version of `dist`.
 
-The former `wing-nuts-6410.pages.dev` address redirects to the new address.
-Its separate Cloudflare project, `wing-nuts-6410`, receives only the files in
-`hosting/old-address-redirect`; do not upload that redirect bundle to the current
-calculator project. The redirect preserves paths for previously shared links.
+The previous `wing-nuts-6410.pages.dev` address remains a separate calculator
+deployment in the `wing-nuts-6410` project. It does not redirect to the new address.
 
 ## Calculator behavior
 
